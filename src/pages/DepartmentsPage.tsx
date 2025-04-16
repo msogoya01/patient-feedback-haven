@@ -1,0 +1,104 @@
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useFeedback } from "@/contexts/FeedbackContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { FiArrowRight } from "react-icons/fi";
+
+const translations = {
+  title: {
+    en: "Select Department",
+    fr: "Sélectionner un Service",
+    es: "Seleccionar Departamento",
+  },
+  subtitle: {
+    en: "Please select the department you'd like to provide feedback for",
+    fr: "Veuillez sélectionner le service pour lequel vous souhaitez donner votre avis",
+    es: "Por favor seleccione el departamento para el que le gustaría proporcionar comentarios",
+  },
+  departmentNames: {
+    en: {
+      "1": "Emergency",
+      "2": "Cardiology",
+      "3": "Pediatrics",
+      "4": "Oncology",
+      "5": "Neurology",
+      "6": "Orthopedics",
+    },
+    fr: {
+      "1": "Urgences",
+      "2": "Cardiologie",
+      "3": "Pédiatrie",
+      "4": "Oncologie",
+      "5": "Neurologie",
+      "6": "Orthopédie",
+    },
+    es: {
+      "1": "Emergencias",
+      "2": "Cardiología",
+      "3": "Pediatría",
+      "4": "Oncología",
+      "5": "Neurología",
+      "6": "Ortopedia",
+    },
+  },
+};
+
+export default function DepartmentsPage() {
+  const { departments, setSelectedDepartment } = useFeedback();
+  const { language } = useTheme();
+  const navigate = useNavigate();
+
+  const handleDepartmentSelect = (departmentId: string) => {
+    const department = departments.find((d) => d.id === departmentId);
+    if (department) {
+      setSelectedDepartment(department);
+      navigate("/feedback");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {translations.title[language as keyof typeof translations.title]}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">
+          {translations.subtitle[language as keyof typeof translations.subtitle]}
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {departments.map((department) => (
+          <Card
+            key={department.id}
+            className="hover:shadow-md transition-shadow cursor-pointer border border-border"
+            onClick={() => handleDepartmentSelect(department.id)}
+          >
+            <CardContent className="p-6 flex flex-col items-center">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                {
+                  translations.departmentNames[
+                    language as keyof typeof translations.departmentNames
+                  ][department.id as keyof typeof translations.departmentNames.en]
+                }
+              </h3>
+              <Button
+                className="flex items-center justify-center bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
+                variant="default"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDepartmentSelect(department.id);
+                }}
+              >
+                Select <FiArrowRight className="ml-2" />
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
