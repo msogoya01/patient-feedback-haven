@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext } from "react";
 
 // Types for our feedback system
@@ -27,10 +26,10 @@ type FeedbackContextType = {
   departments: Department[];
   questions: Question[];
   responses: FeedbackResponse[];
-  selectedDepartment: Department | null;
-  setSelectedDepartment: (department: Department | null) => void;
+  selectedDepartments: Department[];
+  setSelectedDepartments: (departments: Department[]) => void;
   addResponse: (response: Omit<FeedbackResponse, "id" | "timestamp">) => void;
-  getQuestionsByDepartment: (departmentId: string) => Question[];
+  getQuestionsByDepartments: (departmentIds: string[]) => Question[];
 };
 
 // Sample departments and questions
@@ -134,10 +133,10 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const [departments] = useState<Department[]>(initialDepartments);
   const [questions] = useState<Question[]>(initialQuestions);
   const [responses, setResponses] = useState<FeedbackResponse[]>([]);
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+  const [selectedDepartments, setSelectedDepartments] = useState<Department[]>([]);
 
-  const getQuestionsByDepartment = (departmentId: string) => {
-    return questions.filter(question => question.departmentId === departmentId);
+  const getQuestionsByDepartments = (departmentIds: string[]) => {
+    return questions.filter(question => departmentIds.includes(question.departmentId));
   };
 
   const addResponse = (response: Omit<FeedbackResponse, "id" | "timestamp">) => {
@@ -148,8 +147,6 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
     };
     
     setResponses(prev => [...prev, newResponse]);
-    
-    // In a real app, you would send this to a backend API
     console.log("Feedback submitted:", newResponse);
   };
 
@@ -159,10 +156,10 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
         departments,
         questions,
         responses,
-        selectedDepartment,
-        setSelectedDepartment,
+        selectedDepartments,
+        setSelectedDepartments,
         addResponse,
-        getQuestionsByDepartment,
+        getQuestionsByDepartments,
       }}
     >
       {children}

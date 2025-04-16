@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,7 +86,7 @@ const translations = {
 };
 
 export default function FeedbackPage() {
-  const { selectedDepartment, getQuestionsByDepartment, addResponse } = useFeedback();
+  const { selectedDepartments, getQuestionsByDepartments, addResponse } = useFeedback();
   const { language } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -95,12 +94,12 @@ export default function FeedbackPage() {
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  if (!selectedDepartment) {
+  if (!selectedDepartments.length) {
     navigate("/departments");
     return null;
   }
 
-  const questions = getQuestionsByDepartment(selectedDepartment.id);
+  const questions = getQuestionsByDepartments(selectedDepartments.map(d => d.id));
 
   if (questions.length === 0) {
     return (
@@ -164,7 +163,7 @@ export default function FeedbackPage() {
     questions.forEach((question) => {
       addResponse({
         questionId: question.id,
-        departmentId: selectedDepartment.id,
+        departmentId: question.departmentId,
         answer: answers[question.id],
       });
     });
@@ -266,7 +265,7 @@ export default function FeedbackPage() {
               {
                 translations.departmentNames[
                   language as keyof typeof translations.departmentNames
-                ][selectedDepartment.id as keyof typeof translations.departmentNames.en]
+                ][selectedDepartments[0].id as keyof typeof translations.departmentNames.en]
               }
             </span>
           </div>
