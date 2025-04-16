@@ -1,9 +1,11 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ArrowRight } from 'lucide-react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { FiArrowRight } from "react-icons/fi";
 
 const translations = {
   welcome: {
@@ -29,28 +31,30 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigate('/departments');
+    navigate("/departments");
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 min-h-screen bg-gray-100">
-      <div className="bg-white rounded-xl p-6 shadow-md max-w-md w-full">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          {translations.welcome[language as keyof typeof translations.welcome]}
-        </h1>
-        
-        <p className="text-gray-600 text-center mb-6">
-          {translations.clickButton[language as keyof typeof translations.clickButton]}
-        </p>
-        
-        <button
-          className="w-full bg-purple-500 text-white py-4 px-6 rounded-lg flex items-center justify-center font-semibold"
-          onClick={handleContinue}
-        >
-          <span>{translations.continue[language as keyof typeof translations.continue]}</span>
-          <ArrowRight className="ml-2" size={20} />
-        </button>
-      </div>
+    <div className="flex flex-col items-center justify-center h-full">
+      <Card className="w-full max-w-md mx-auto bg-card dark:bg-card shadow-md">
+        <CardContent className="pt-6 flex flex-col items-center">
+          <h1 className="text-2xl font-bold text-primary dark:text-primary mb-8">
+            {translations.welcome[language as keyof typeof translations.welcome]}
+          </h1>
+          
+          <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
+            {translations.clickButton[language as keyof typeof translations.clickButton]}
+          </p>
+          
+          <Button
+            onClick={handleContinue}
+            className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 dark:bg-medfeedback-blue dark:hover:bg-medfeedback-blue/90 text-white px-6 py-2 rounded-md font-medium transition-colors group"
+          >
+            {translations.continue[language as keyof typeof translations.continue]}
+            <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
