@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ArrowRight } from 'lucide-react-native';
+import { ArrowRight } from 'lucide-react';
 
 const translations = {
   welcome: {
@@ -27,85 +26,31 @@ const translations = {
 export default function HomePage() {
   const { user } = useAuth();
   const { language } = useTheme();
-  const navigation = useNavigation();
+  const navigate = useNavigate();
 
   const handleContinue = () => {
-    navigation.navigate('Departments');
+    navigate('/departments');
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>
+    <div className="flex flex-col items-center justify-center p-4 min-h-screen bg-gray-100">
+      <div className="bg-white rounded-xl p-6 shadow-md max-w-md w-full">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           {translations.welcome[language as keyof typeof translations.welcome]}
-        </Text>
+        </h1>
         
-        <Text style={styles.description}>
+        <p className="text-gray-600 text-center mb-6">
           {translations.clickButton[language as keyof typeof translations.clickButton]}
-        </Text>
+        </p>
         
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleContinue}
+        <button
+          className="w-full bg-purple-500 text-white py-4 px-6 rounded-lg flex items-center justify-center font-semibold"
+          onClick={handleContinue}
         >
-          <Text style={styles.buttonText}>
-            {translations.continue[language as keyof typeof translations.continue]}
-          </Text>
-          <ArrowRight color="white" size={20} style={{ marginLeft: 8 }} />
-        </TouchableOpacity>
-      </View>
-    </View>
+          <span>{translations.continue[language as keyof typeof translations.continue]}</span>
+          <ArrowRight className="ml-2" size={20} />
+        </button>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    width: '100%',
-    maxWidth: 400,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 24,
-  },
-  description: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  button: {
-    backgroundColor: '#9b87f5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 8,
-    width: '100%',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});

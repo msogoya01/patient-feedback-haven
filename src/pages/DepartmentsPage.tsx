@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigate } from 'react-router-dom';
 import { useFeedback } from '@/contexts/FeedbackContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ArrowRight } from 'lucide-react-native';
+import { ArrowRight } from 'lucide-react';
 
 const translations = {
   title: {
@@ -63,7 +62,7 @@ const translations = {
 export default function DepartmentsPage() {
   const { departments, selectedDepartments, setSelectedDepartments } = useFeedback();
   const { language } = useTheme();
-  const navigation = useNavigation();
+  const navigate = useNavigate();
 
   const handleDepartmentToggle = (department: any) => {
     const isSelected = selectedDepartments.some(d => d.id === department.id);
@@ -77,111 +76,52 @@ export default function DepartmentsPage() {
   const handleContinue = () => {
     if (selectedDepartments.length === 0) {
       // Show toast using react-native-toast-message
+      console.log("No departments selected");
       return;
     }
-    navigation.navigate('Feedback');
+    navigate('/feedback');
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>
+    <div className="flex flex-col h-full p-4 bg-white">
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
           {translations.title[language as keyof typeof translations.title]}
-        </Text>
-        <Text style={styles.subtitle}>
+        </h1>
+        <p className="text-gray-600">
           {translations.subtitle[language as keyof typeof translations.subtitle]}
-        </Text>
-      </View>
+        </p>
+      </div>
 
-      <ScrollView style={styles.departmentList}>
+      <div className="flex-1 overflow-auto">
         {departments.map((department) => (
-          <TouchableOpacity
+          <div
             key={department.id}
-            style={[
-              styles.card,
-              selectedDepartments.some(d => d.id === department.id) && styles.selectedCard
-            ]}
-            onPress={() => handleDepartmentToggle(department)}
+            className={`border rounded-lg p-4 mb-3 cursor-pointer transition-colors ${
+              selectedDepartments.some(d => d.id === department.id)
+                ? 'bg-purple-50 border-purple-500'
+                : 'border-gray-200'
+            }`}
+            onClick={() => handleDepartmentToggle(department)}
           >
-            <View style={styles.cardContent}>
-              <Text style={styles.departmentName}>
+            <div className="flex items-center">
+              <span className="text-gray-800">
                 {translations.departmentNames[language as keyof typeof translations.departmentNames][department.id as keyof typeof translations.departmentNames.en]}
-              </Text>
-            </View>
-          </TouchableOpacity>
+              </span>
+            </div>
+          </div>
         ))}
-      </ScrollView>
+      </div>
 
-      <TouchableOpacity
-        style={styles.continueButton}
-        onPress={handleContinue}
+      <button
+        className="bg-purple-500 text-white flex items-center justify-center py-4 px-6 rounded-lg mt-4"
+        onClick={handleContinue}
       >
-        <Text style={styles.buttonText}>
+        <span className="font-semibold">
           {translations.continueButton[language as keyof typeof translations.continueButton]}
-        </Text>
-        <ArrowRight color="white" size={20} style={{ marginLeft: 8 }} />
-      </TouchableOpacity>
-    </View>
+        </span>
+        <ArrowRight className="ml-2" size={20} />
+      </button>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-  departmentList: {
-    flex: 1,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#e1e1e1',
-  },
-  selectedCard: {
-    backgroundColor: 'rgba(155, 135, 245, 0.1)',
-    borderColor: '#9b87f5',
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  departmentName: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    flex: 1,
-  },
-  continueButton: {
-    backgroundColor: '#9b87f5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 16,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
