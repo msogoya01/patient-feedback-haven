@@ -1,13 +1,10 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useFeedback } from "@/contexts/FeedbackContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import { FiArrowRight } from "react-icons/fi";
-import { useToast } from "@/components/ui/use-toast";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useFeedback } from '@/contexts/FeedbackContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { ArrowRight } from 'lucide-react-native';
 
 const translations = {
   title: {
@@ -66,8 +63,7 @@ const translations = {
 export default function DepartmentsPage() {
   const { departments, selectedDepartments, setSelectedDepartments } = useFeedback();
   const { language } = useTheme();
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const navigation = useNavigation();
 
   const handleDepartmentToggle = (department: any) => {
     const isSelected = selectedDepartments.some(d => d.id === department.id);
@@ -80,61 +76,112 @@ export default function DepartmentsPage() {
 
   const handleContinue = () => {
     if (selectedDepartments.length === 0) {
-      toast({
-        title: translations.noSelectionError[language as keyof typeof translations.noSelectionError],
-        description: translations.selectionErrorDesc[language as keyof typeof translations.selectionErrorDesc],
-        variant: "destructive",
-      });
+      // Show toast using react-native-toast-message
       return;
     }
-    navigate("/feedback");
+    navigation.navigate('Feedback');
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>
           {translations.title[language as keyof typeof translations.title]}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 mt-2">
+        </Text>
+        <Text style={styles.subtitle}>
           {translations.subtitle[language as keyof typeof translations.subtitle]}
-        </p>
-      </div>
+        </Text>
+      </View>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <ScrollView style={styles.departmentList}>
         {departments.map((department) => (
-          <Card
+          <TouchableOpacity
             key={department.id}
-            className={`hover:shadow-md transition-shadow cursor-pointer border border-border ${
-              selectedDepartments.some(d => d.id === department.id) 
-                ? 'bg-medfeedback-blue/10 border-medfeedback-blue'
-                : ''
-            }`}
-            onClick={() => handleDepartmentToggle(department)}
+            style={[
+              styles.card,
+              selectedDepartments.some(d => d.id === department.id) && styles.selectedCard
+            ]}
+            onPress={() => handleDepartmentToggle(department)}
           >
-            <CardContent className="p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Checkbox
-                  checked={selectedDepartments.some(d => d.id === department.id)}
-                  onCheckedChange={() => handleDepartmentToggle(department)}
-                />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  {translations.departmentNames[language as keyof typeof translations.departmentNames][department.id as keyof typeof translations.departmentNames.en]}
-                </h3>
-              </div>
-            </CardContent>
-          </Card>
+            <View style={styles.cardContent}>
+              <Text style={styles.departmentName}>
+                {translations.departmentNames[language as keyof typeof translations.departmentNames][department.id as keyof typeof translations.departmentNames.en]}
+              </Text>
+            </View>
+          </TouchableOpacity>
         ))}
-      </div>
+      </ScrollView>
 
-      <div className="flex justify-center mt-6">
-        <Button
-          className="flex items-center justify-center bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
-          onClick={handleContinue}
-        >
-          {translations.continueButton[language as keyof typeof translations.continueButton]} <FiArrowRight className="ml-2" />
-        </Button>
-      </div>
-    </div>
+      <TouchableOpacity
+        style={styles.continueButton}
+        onPress={handleContinue}
+      >
+        <Text style={styles.buttonText}>
+          {translations.continueButton[language as keyof typeof translations.continueButton]}
+        </Text>
+        <ArrowRight color="white" size={20} style={{ marginLeft: 8 }} />
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  departmentList: {
+    flex: 1,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e1e1e1',
+  },
+  selectedCard: {
+    backgroundColor: 'rgba(155, 135, 245, 0.1)',
+    borderColor: '#9b87f5',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  departmentName: {
+    fontSize: 16,
+    color: '#1a1a1a',
+    flex: 1,
+  },
+  continueButton: {
+    backgroundColor: '#9b87f5',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
