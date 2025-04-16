@@ -36,28 +36,41 @@ const translations = {
   departmentNames: {
     en: {
       "1": "Emergency",
-      "2": "Cardiology",
-      "3": "Pediatrics",
-      "4": "Oncology",
-      "5": "Neurology",
-      "6": "Orthopedics",
+      "2": "Outpatient Clinic",
+      "3": "Inpatient Clinic",
+      "4": "Radiology",
+      "5": "Laboratory",
+      "6": "Pharmacy",
+      "7": "Billing",
+      "8": "Mortuary",
+      "9": "Maternity",
+      "10": "Immunization",
     },
     fr: {
       "1": "Urgences",
-      "2": "Cardiologie",
-      "3": "Pédiatrie",
-      "4": "Oncologie",
-      "5": "Neurologie",
-      "6": "Orthopédie",
+      "2": "Clinique Externe",
+      "3": "Clinique Interne",
+      "4": "Radiologie",
+      "5": "Laboratoire",
+      "6": "Pharmacie",
+      "7": "Facturation",
+      "8": "Morgue",
+      "9": "Maternité",
+      "10": "Vaccination"
+    
     },
     es: {
       "1": "Emergencias",
-      "2": "Cardiología",
-      "3": "Pediatría",
-      "4": "Oncología",
-      "5": "Neurología",
-      "6": "Ortopedia",
-    },
+      "2": "Clínica Ambulatoria",
+      "3": "Clínica de Hospitalización",
+      "4": "Radiología",
+      "5": "Laboratorio",
+      "6": "Farmacia",
+      "7": "Facturación",
+      "8": "Morgue",
+      "9": "Maternidad",
+      "10": "Inmunización"
+    }
   },
 };
 
