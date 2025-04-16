@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,6 +46,21 @@ const translations = {
       "6": "Ortopedia",
     },
   },
+  continueButton: {
+    en: "Continue",
+    fr: "Continuer",
+    es: "Continuar",
+  },
+  noSelectionError: {
+    en: "No departments selected",
+    fr: "Aucun service sélectionné",
+    es: "No hay departamentos seleccionados",
+  },
+  selectionErrorDesc: {
+    en: "Please select at least one department to provide feedback.",
+    fr: "Veuillez sélectionner au moins un service pour donner votre avis.",
+    es: "Por favor, seleccione al menos un departamento para proporcionar comentarios.",
+  }
 };
 
 export default function DepartmentsPage() {
@@ -65,8 +81,8 @@ export default function DepartmentsPage() {
   const handleContinue = () => {
     if (selectedDepartments.length === 0) {
       toast({
-        title: "No departments selected",
-        description: "Please select at least one department to provide feedback.",
+        title: translations.noSelectionError[language as keyof typeof translations.noSelectionError],
+        description: translations.selectionErrorDesc[language as keyof typeof translations.selectionErrorDesc],
         variant: "destructive",
       });
       return;
@@ -116,7 +132,7 @@ export default function DepartmentsPage() {
           className="flex items-center justify-center bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
           onClick={handleContinue}
         >
-          Continue <FiArrowRight className="ml-2" />
+          {translations.continueButton[language as keyof typeof translations.continueButton]} <FiArrowRight className="ml-2" />
         </Button>
       </div>
     </div>
