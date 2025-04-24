@@ -11,91 +11,35 @@ import { useFeedback } from "@/contexts/FeedbackContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { FiArrowRight, FiCheck } from "react-icons/fi";
 
-const translations = {
+const translations: Record<string, Record<string, string>> = {
+  thankYou: {
+    en: "Thank you for your feedback!",
+    es: "¡Gracias por tus comentarios!"
+  },
+  helpImprove: {
+    en: "Your input helps us improve.",
+    es: "Tu opinión nos ayuda a mejorar."
+  },
+  returnHome: {
+    en: "Return Home",
+    es: "Volver al inicio"
+  },
   title: {
-    en: "Feedback Form",
-    fr: "Formulaire de Retour",
-    es: "Formulario de Comentarios",
-  },
-  department: {
-    en: "Department",
-    fr: "Service",
-    es: "Departamento",
-  },
-  rating: {
-    en: "Rating",
-    fr: "Évaluation",
-    es: "Calificación",
-  },
-  submitButton: {
-    en: "Submit Feedback",
-    fr: "Soumettre",
-    es: "Enviar",
-  },
-  nextButton: {
-    en: "Next",
-    fr: "Suivant",
-    es: "Siguiente",
+    en: "Feedback",
+    es: "Retroalimentación"
   },
   prevButton: {
     en: "Previous",
-    fr: "Précédent",
-    es: "Anterior",
+    es: "Anterior"
   },
-  thankYou: {
-    en: "Thank you for your feedback!",
-    fr: "Merci pour votre retour!",
-    es: "¡Gracias por sus comentarios!",
+  submitButton: {
+    en: "Submit",
+    es: "Enviar"
   },
-  helpImprove: {
-    en: "Your feedback helps us improve our services.",
-    fr: "Vos commentaires nous aident à améliorer nos services.",
-    es: "Sus comentarios nos ayudan a mejorar nuestros servicios.",
-  },
-  returnHome: {
-    en: "Return to Home",
-    fr: "Retour à l'Accueil",
-    es: "Volver al Inicio",
-  },
-  departmentNames: {
-    en: {
-        "1": "Emergency",
-        "2": "Outpatient Clinic",
-        "3": "Inpatient Clinic",
-        "4": "Radiology",
-        "5": "Laboratory",
-        "6": "Pharmacy",
-        "7": "Billing",
-        "8": "Mortuary",
-        "9": "Maternity",
-        "10": "Immunization",
-    },
-    fr: {
-        "1": "Urgences",
-        "2": "Clinique Externe",
-        "3": "Clinique Interne",
-        "4": "Radiologie",
-        "5": "Laboratoire",
-        "6": "Pharmacie",
-        "7": "Facturation",
-        "8": "Morgue",
-        "9": "Maternité",
-        "10": "Vaccination",
-      },   
-    es: {
-        "1": "Emergencias",
-        "2": "Clínica Ambulatoria",
-        "3": "Clínica de Hospitalización",
-        "4": "Radiología",
-        "5": "Laboratorio",
-        "6": "Farmacia",
-        "7": "Facturación",
-        "8": "Morgue",
-        "9": "Maternidad",
-        "10": "Inmunización"
-      }
-      
-  },
+  nextButton: {
+    en: "Next",
+    es: "Siguiente"
+  }
 };
 
 export default function FeedbackPage() {
@@ -103,7 +47,7 @@ export default function FeedbackPage() {
   const { language } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -112,80 +56,55 @@ export default function FeedbackPage() {
     return null;
   }
 
-  const questions = getQuestionsByDepartments(selectedDepartments.map(d => d.id));
+  const allQuestions = getQuestionsByDepartments(selectedDepartments.map(d => d.id));
 
-  if (questions.length === 0) {
-    return (
-      <div className="text-center p-6">
-        <p className="text-gray-600 dark:text-gray-300">
-          No questions available for this department yet.
-        </p>
-        <Button 
-          className="mt-4 bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
-          onClick={() => navigate("/departments")}
-        >
-          Go Back
-        </Button>
-      </div>
-    );
-  }
+  const groupedQuestions = Object.values(
+    allQuestions.reduce((acc, question) => {
+      const key = `${question.departmentId}`;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(question);
+      return acc;
+    }, {} as Record<string, typeof allQuestions>)
+  );
 
-  const currentQuestion = questions[currentQuestionIndex];
+  const currentGroup = groupedQuestions[currentGroupIndex];
 
   const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    if (currentGroupIndex < groupedQuestions.length - 1) {
+      setCurrentGroupIndex(currentGroupIndex + 1);
     }
   };
 
   const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    if (currentGroupIndex > 0) {
+      setCurrentGroupIndex(currentGroupIndex - 1);
     }
   };
 
-  const handleAnswerChange = (value: string | number) => {
-    setAnswers({
-      ...answers,
-      [currentQuestion.id]: value,
-    });
+  const handleAnswerChange = (questionId: string, value: string | number) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: value,
+    }));
   };
 
   const handleSubmit = () => {
-    // Check if all questions have been answered
-    const unansweredQuestions = questions.filter(
-      (q) => !answers[q.id] && answers[q.id] !== 0
-    );
-
-    if (unansweredQuestions.length > 0) {
-      toast({
-        title: "Please answer all questions",
-        description: "Some questions have not been answered yet.",
-        variant: "destructive",
-      });
-      
-      // Navigate to the first unanswered question
-      const firstUnansweredIndex = questions.findIndex(
-        (q) => q.id === unansweredQuestions[0].id
-      );
-      setCurrentQuestionIndex(firstUnansweredIndex);
+    const unanswered = allQuestions.filter(q => !answers[q.id] && answers[q.id] !== 0);
+    if (unanswered.length > 0) {
+      toast({ title: "Please answer all questions", description: "Some questions are unanswered.", variant: "destructive" });
+      const firstUnanswered = groupedQuestions.findIndex(group => group.some(q => q.id === unanswered[0].id));
+      setCurrentGroupIndex(firstUnanswered);
       return;
     }
 
-    // Submit all answers
-    questions.forEach((question) => {
-      addResponse({
-        questionId: question.id,
-        departmentId: question.departmentId,
-        answer: answers[question.id],
-      });
+    allQuestions.forEach((q) => {
+      addResponse({ questionId: q.id, departmentId: q.departmentId, answer: answers[q.id] });
     });
 
     toast({
-      title: translations.thankYou[language as keyof typeof translations.thankYou],
-      description: translations.helpImprove[language as keyof typeof translations.helpImprove],
+      title: translations.thankYou[language],
+      description: translations.helpImprove[language],
     });
-
     setSubmitted(true);
   };
 
@@ -196,42 +115,34 @@ export default function FeedbackPage() {
           <FiCheck className="w-8 h-8 text-green-600 dark:text-green-300" />
         </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {translations.thankYou[language as keyof typeof translations.thankYou]}
+          {translations.thankYou[language]}
         </h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          {translations.helpImprove[language as keyof typeof translations.helpImprove]}
+          {translations.helpImprove[language]}
         </p>
-        <Button
-          className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
-          onClick={() => navigate("/home")}
-        >
-          {translations.returnHome[language as keyof typeof translations.returnHome]}
+        <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={() => navigate("/home")}>
+          {translations.returnHome[language]}
         </Button>
       </div>
     );
   }
 
-  const renderQuestionInput = () => {
-    switch (currentQuestion.type) {
+  const renderQuestionInput = (question: any) => {
+    const answer = answers[question.id];
+    switch (question.type) {
       case "rating":
         return (
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 px-2">
-              <span>Not Satisfied</span>
-              <span>Very Satisfied</span>
-            </div>
+          <div className="space-y-2">
             <Slider
-              defaultValue={[answers[currentQuestion.id] as number || 5]}
+              value={[typeof answer === "number" ? answer : 0]}
               max={10}
-              min={1}
+              min={0}
               step={1}
-              onValueChange={(value) => handleAnswerChange(value[0])}
+              onValueChange={(value) => handleAnswerChange(question.id, value[0])}
             />
-            <div className="flex justify-between">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                <div key={value} className="text-xs text-center">
-                  {value}
-                </div>
+            <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+              {[...Array(11).keys()].map((num) => (
+                <span key={num}>{num}</span>
               ))}
             </div>
           </div>
@@ -239,20 +150,19 @@ export default function FeedbackPage() {
       case "text":
         return (
           <Textarea
-            value={answers[currentQuestion.id] as string || ""}
-            onChange={(e) => handleAnswerChange(e.target.value)}
+            value={answer as string || ""}
+            onChange={(e) => handleAnswerChange(question.id, e.target.value)}
             placeholder="Enter your feedback here..."
-            className="min-h-[100px]"
           />
         );
       case "multiple-choice":
         return (
           <RadioGroup
-            value={answers[currentQuestion.id] as string || ""}
-            onValueChange={handleAnswerChange}
+            value={answer as string || ""}
+            onValueChange={(val) => handleAnswerChange(question.id, val)}
             className="space-y-3"
           >
-            {currentQuestion.options?.map((option, index) => (
+            {question.options?.map((option, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <RadioGroupItem value={option} id={`option-${index}`} />
                 <Label htmlFor={`option-${index}`}>{option}</Label>
@@ -270,60 +180,30 @@ export default function FeedbackPage() {
       <Card className="border border-border">
         <CardHeader>
           <CardTitle className="text-xl text-center text-gray-900 dark:text-white">
-            {translations.title[language as keyof typeof translations.title]}
+            {translations.title[language]}
           </CardTitle>
-          <div className="text-center text-gray-600 dark:text-gray-300">
-            {translations.department[language as keyof typeof translations.department]}:{" "}
-            <span className="font-medium text-medfeedback-blue">
-              {
-                translations.departmentNames[
-                  language as keyof typeof translations.departmentNames
-                ][selectedDepartments[0].id as keyof typeof translations.departmentNames.en]
-              }
-            </span>
-          </div>
         </CardHeader>
         <CardContent>
-          <div className="mb-2 flex justify-between text-sm text-gray-500 dark:text-gray-400">
-            <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
-            <span>{Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%</span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mb-6">
-            <div
-              className="bg-medfeedback-blue h-1.5 rounded-full transition-all duration-300"
-              style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-            ></div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              {currentQuestion.text}
-            </h3>
-            {renderQuestionInput()}
-          </div>
+          {currentGroup.map((q, idx) => (
+            <div key={q.id} className="mb-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                {q.text}
+              </h3>
+              {renderQuestionInput(q)}
+            </div>
+          ))}
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0}
-          >
-            {translations.prevButton[language as keyof typeof translations.prevButton]}
+          <Button variant="outline" onClick={handlePrevious} disabled={currentGroupIndex === 0}>
+            {translations.prevButton[language]}
           </Button>
-
-          {currentQuestionIndex === questions.length - 1 ? (
-            <Button
-              className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
-              onClick={handleSubmit}
-            >
-              {translations.submitButton[language as keyof typeof translations.submitButton]}
+          {currentGroupIndex === groupedQuestions.length - 1 ? (
+            <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={handleSubmit}>
+              {translations.submitButton[language]}
             </Button>
           ) : (
-            <Button
-              className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white"
-              onClick={handleNext}
-            >
-              {translations.nextButton[language as keyof typeof translations.nextButton]}
+            <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={handleNext}>
+              {translations.nextButton[language]}
               <FiArrowRight className="ml-2" />
             </Button>
           )}

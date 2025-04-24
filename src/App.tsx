@@ -9,6 +9,7 @@ import { FeedbackProvider } from "@/contexts/FeedbackContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import FeedbackForm from "./pages/HomePage";
 import ObjectivePage from "./pages/ObjectivePage";
 import HistoryPage from "./pages/HistoryPage";
 import NotificationsPage from "./pages/NotificationsPage";
@@ -18,7 +19,7 @@ import FeedbackPage from "./pages/FeedbackPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
-
+  
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>

@@ -69,7 +69,7 @@ const translations = {
       "7": "Facturación",
       "8": "Morgue",
       "9": "Maternidad",
-      "10": "Inmunización"
+      "10": "Inmunización",
     }
   },
 };
