@@ -24,13 +24,13 @@ export function QuestionGroup({ question, answer, onAnswerChange }: QuestionProp
           <div className="space-y-2">
             <Slider
               value={[typeof answer === "number" ? answer : 0]}
-              max={10}
+              max={5}
               min={0}
               step={1}
               onValueChange={(value) => onAnswerChange(question.id, value[0])}
             />
             <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-              {[...Array(11).keys()].map((num) => (
+              {[...Array(6).keys()].map((num) => (
                 <span key={num}>{num}</span>
               ))}
             </div>

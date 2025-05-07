@@ -66,10 +66,10 @@ export default function VisitorFeedbackPage() {
   const { language } = useTheme();
   const [submitted, setSubmitted] = useState(false);
   const [ratings, setRatings] = useState({
-    staff: 5,
-    cleanliness: 5,
-    time: 5,
-    experience: 5
+    staff: 2.5,
+    cleanliness: 2.5,
+    time: 2.5,
+    experience: 2.5
   });
   const [comments, setComments] = useState("");
 
@@ -141,13 +141,13 @@ export default function VisitorFeedbackPage() {
             </Label>
             <Slider
               value={[ratings.staff]}
-              max={10}
+              max={5}
               min={0}
               step={1}
               onValueChange={(value) => handleRatingChange("staff", value)}
             />
             <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-              {[...Array(11).keys()].map((num) => (
+              {[...Array(6).keys()].map((num) => (
                 <span key={num}>{num}</span>
               ))}
             </div>
@@ -160,13 +160,13 @@ export default function VisitorFeedbackPage() {
             </Label>
             <Slider
               value={[ratings.cleanliness]}
-              max={10}
+              max={5}
               min={0}
               step={1}
               onValueChange={(value) => handleRatingChange("cleanliness", value)}
             />
             <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-              {[...Array(11).keys()].map((num) => (
+              {[...Array(6).keys()].map((num) => (
                 <span key={num}>{num}</span>
               ))}
             </div>
@@ -179,13 +179,13 @@ export default function VisitorFeedbackPage() {
             </Label>
             <Slider
               value={[ratings.time]}
-              max={10}
+              max={5}
               min={0}
               step={1}
               onValueChange={(value) => handleRatingChange("time", value)}
             />
             <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-              {[...Array(11).keys()].map((num) => (
+              {[...Array(6).keys()].map((num) => (
                 <span key={num}>{num}</span>
               ))}
             </div>
@@ -198,13 +198,13 @@ export default function VisitorFeedbackPage() {
             </Label>
             <Slider
               value={[ratings.experience]}
-              max={10}
+              max={5}
               min={0}
               step={1}
               onValueChange={(value) => handleRatingChange("experience", value)}
             />
             <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
-              {[...Array(11).keys()].map((num) => (
+              {[...Array(6).keys()].map((num) => (
                 <span key={num}>{num}</span>
               ))}
             </div>
