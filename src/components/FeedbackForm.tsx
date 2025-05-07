@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -28,8 +29,13 @@ export function FeedbackForm() {
       return;
     }
 
-    // You can also store the formatted date: format(visitDate, "yyyy-MM-dd")
-    navigate('/departments');
+    // Route to different pages based on user type
+    if (userType === 'visitor') {
+      navigate('/visitor-feedback');
+    } else {
+      // Patient goes to department selection
+      navigate('/departments');
+    }
   };
 
   return (

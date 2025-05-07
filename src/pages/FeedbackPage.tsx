@@ -39,7 +39,15 @@ const translations: Record<string, Record<string, string>> = {
   nextButton: {
     en: "Next",
     es: "Siguiente"
-  }
+  },
+  finalComments: {
+    en: "Additional Comments",
+    es: "Comentarios Adicionales"
+  },
+  commentsPlaceholder: {
+    en: "Please provide any additional feedback or comments about your experience...",
+    es: "Por favor proporcione cualquier comentario adicional sobre su experiencia..."
+  },
 };
 
 export default function FeedbackPage() {
@@ -50,6 +58,8 @@ export default function FeedbackPage() {
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [finalComment, setFinalComment] = useState("");
+  const [showCommentSection, setShowCommentSection] = useState(false);
 
   if (!selectedDepartments.length) {
     navigate("/departments");
@@ -72,11 +82,17 @@ export default function FeedbackPage() {
   const handleNext = () => {
     if (currentGroupIndex < groupedQuestions.length - 1) {
       setCurrentGroupIndex(currentGroupIndex + 1);
+    } else {
+      // If we've gone through all departments, show the comment section
+      setShowCommentSection(true);
     }
   };
 
   const handlePrevious = () => {
-    if (currentGroupIndex > 0) {
+    if (showCommentSection) {
+      setShowCommentSection(false);
+      setCurrentGroupIndex(groupedQuestions.length - 1);
+    } else if (currentGroupIndex > 0) {
       setCurrentGroupIndex(currentGroupIndex - 1);
     }
   };
@@ -89,17 +105,33 @@ export default function FeedbackPage() {
   };
 
   const handleSubmit = () => {
-    const unanswered = allQuestions.filter(q => !answers[q.id] && answers[q.id] !== 0);
-    if (unanswered.length > 0) {
-      toast({ title: "Please answer all questions", description: "Some questions are unanswered.", variant: "destructive" });
-      const firstUnanswered = groupedQuestions.findIndex(group => group.some(q => q.id === unanswered[0].id));
-      setCurrentGroupIndex(firstUnanswered);
+    if (!showCommentSection) {
+      const unanswered = allQuestions.filter(q => !answers[q.id] && answers[q.id] !== 0);
+      if (unanswered.length > 0) {
+        toast({ title: "Please answer all questions", description: "Some questions are unanswered.", variant: "destructive" });
+        const firstUnanswered = groupedQuestions.findIndex(group => group.some(q => q.id === unanswered[0].id));
+        setCurrentGroupIndex(firstUnanswered);
+        return;
+      }
+      
+      // Show the comment section after all questions are answered
+      setShowCommentSection(true);
       return;
     }
 
+    // Submit all answers including the final comment
     allQuestions.forEach((q) => {
       addResponse({ questionId: q.id, departmentId: q.departmentId, answer: answers[q.id] });
     });
+    
+    // Add the final comment as a special response
+    if (finalComment.trim()) {
+      addResponse({ 
+        questionId: "final-comment", 
+        departmentId: "all", 
+        answer: finalComment 
+      });
+    }
 
     toast({
       title: translations.thankYou[language],
@@ -123,6 +155,39 @@ export default function FeedbackPage() {
         <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={() => navigate("/home")}>
           {translations.returnHome[language]}
         </Button>
+      </div>
+    );
+  }
+
+  // Render comment section if all department questions are answered
+  if (showCommentSection) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <Card className="border border-border">
+          <CardHeader>
+            <CardTitle className="text-xl text-center text-gray-900 dark:text-white">
+              {translations.finalComments[language as keyof typeof translations.finalComments]}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-6">
+              <Textarea
+                value={finalComment}
+                onChange={(e) => setFinalComment(e.target.value)}
+                placeholder={translations.commentsPlaceholder[language as keyof typeof translations.commentsPlaceholder]}
+                className="min-h-[150px]"
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" onClick={handlePrevious}>
+              {translations.prevButton[language]}
+            </Button>
+            <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={handleSubmit}>
+              {translations.submitButton[language]}
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
@@ -199,12 +264,11 @@ export default function FeedbackPage() {
           </Button>
           {currentGroupIndex === groupedQuestions.length - 1 ? (
             <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={handleSubmit}>
-              {translations.submitButton[language]}
+              {translations.nextButton[language]} <FiArrowRight className="ml-2" />
             </Button>
           ) : (
             <Button className="bg-medfeedback-blue hover:bg-medfeedback-blue/90 text-white" onClick={handleNext}>
-              {translations.nextButton[language]}
-              <FiArrowRight className="ml-2" />
+              {translations.nextButton[language]} <FiArrowRight className="ml-2" />
             </Button>
           )}
         </CardFooter>
